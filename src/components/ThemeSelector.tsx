@@ -1,6 +1,0 @@
-import { Check, Palette } from "lucide-react";
-import { useState } from "react";
-import { themes } from "@/data/demo";
-import { useApp } from "@/context/AppContext";
-import { Button } from "@/components/ui/AppButton";
-export function ThemeSelector(){const {themeId,setTheme}=useApp();const [open,setOpen]=useState(false);return <div className="relative"><Button variant="ghost" aria-label="Choose theme" onClick={()=>setOpen(x=>!x)} className="px-3"><Palette className="size-4"/><span className="hidden xl:inline">Theme</span></Button>{open&&<div className="absolute right-0 top-12 z-50 w-72 rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-2xl"><p className="px-2 pb-2 text-xs font-semibold uppercase text-muted-foreground">Choose a visual theme</p><div className="grid gap-1">{themes.map(t=><button key={t.id} onClick={()=>{setTheme(t.id);setOpen(false)}} className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-muted"><span className="flex gap-1"><i className="size-5 rounded-full" style={{background:t.primary}}/><i className="size-5 rounded-full" style={{background:t.accent}}/></span><span className="flex-1 text-sm font-medium">{t.name}</span>{themeId===t.id&&<Check className="size-4 text-primary"/>}</button>)}</div></div>}</div>}

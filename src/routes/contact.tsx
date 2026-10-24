@@ -1,4 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";import { useState, type FormEvent } from "react";import { toast } from "sonner";import { PublicShell } from "@/components/PublicShell";import { Button } from "@/components/ui/AppButton";
-export const Route=createFileRoute("/contact")({head:()=>({meta:[{title:"Contact Meridian Estate Intelligence"},{name:"description",content:"Share a property requirement with our brokerage team."},{property:"og:title",content:"Contact Meridian"},{property:"og:description",content:"Share a property requirement with our brokerage team."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Contact});
-function Contact(){const[loading,setLoading]=useState(false);const submit=(e:FormEvent<HTMLFormElement>)=>{e.preventDefault();const form=e.currentTarget;setLoading(true);setTimeout(()=>{setLoading(false);toast.success("Thank you. A brokerage advisor will follow up.");form.reset()},700)};return <PublicShell><main className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[.8fr_1.2fr]"><section><p className="text-xs font-bold uppercase text-primary">Contact</p><h1 className="mt-3 font-display text-5xl font-semibold">Tell us what you need.</h1><p className="mt-5 leading-7 text-muted-foreground">Share your requirement and a brokerage advisor will help you review suitable next steps.</p><div className="mt-10 space-y-5 text-sm">{[{Icon:Phone,text:"+92 300 000 0000"},{Icon:MessageCircle,text:"WhatsApp consultation"},{Icon:Mail,text:"hello@meridian.example"},{Icon:MapPin,text:"Lahore, Pakistan · General service area"}].map(({Icon,text})=><p key={text}><Icon className="mr-3 inline size-4 text-primary"/>{text}</p>)}<p className="text-muted-foreground">Business hours shown are sample information for this demonstration.</p></div></section><form onSubmit={submit} className="rounded-xl border border-border bg-card p-7 shadow-lg"><h2 className="font-display text-2xl font-semibold">Property requirement</h2><div className="mt-5 grid gap-4 sm:grid-cols-2"><Field label="Name" type="text"/><Field label="Email" type="email"/><Field label="Phone" type="tel"/><label className="text-xs font-semibold">I AM INTERESTED IN<select className="mt-1 w-full rounded-lg border border-border bg-background p-3 text-sm"><option>Buying a property</option><option>Renting a property</option><option>Listing a property</option></select></label></div><label className="mt-4 block text-xs font-semibold">REQUIREMENT / MESSAGE<textarea required minLength={20} rows={6} className="mt-1 w-full rounded-lg border border-border bg-background p-3 text-sm" placeholder="Property type, preferred area, size and budget"/></label><Button disabled={loading} className="mt-5 w-full">{loading?"Sending…":"Submit requirement"}</Button></form></main></PublicShell>}
-function Field({label,type}:{label:string;type:string}){return <label className="text-xs font-semibold">{label.toUpperCase()}<input required type={type} className="mt-1 w-full rounded-lg border border-border bg-background p-3 text-sm"/></label>}
+import { createFileRoute } from "@tanstack/react-router";
+import { PublicShell, PageHero } from "@/components/site/PublicShell";
+import { ContactBlock } from "@/components/site/sections";
+import p5 from "@/assets/p5.jpg";
+
+export const Route = createFileRoute("/contact")({
+  head: () => ({
+    meta: [
+      { title: "Contact Us — Aurelia Estates" },
+      { name: "description", content: "Call, WhatsApp or email Aurelia Estates, or send your property requirement online." },
+      { property: "og:title", content: "Contact Aurelia Estates" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:description", content: "Speak with a broker or submit your requirement in two minutes." },
+    ],
+  }),
+  component: () => (
+    <PublicShell>
+      <PageHero image={p5} eyebrow="Contact" title="Let's find your next property" text="Reach us on any channel — a broker replies within two business hours." />
+      <ContactBlock />
+    </PublicShell>
+  ),
+});

@@ -1,12 +1,89 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Bot, Building2, CheckCircle2, Headphones, Mic, Search, ShieldCheck, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PublicShell } from "@/components/site/PublicShell";
+import { SearchBar } from "@/components/site/SearchBar";
+import { PropertyCard } from "@/components/site/PropertyCard";
+import { Reveal, SectionHeading } from "@/components/site/primitives";
+import { AISection, ContactBlock, CTA, HowItWorks, Reviews, ServicesGrid, StatsBand } from "@/components/site/sections";
+import { PROPERTIES } from "@/lib/data";
 import hero from "@/assets/hero-villa.jpg";
-import { PublicShell } from "@/components/PublicShell";
-import { PropertyCard } from "@/components/PropertyCard";
-import { Button } from "@/components/ui/AppButton";
-import { useApp } from "@/context/AppContext";
+import { CircuitField, MotionText } from "@/components/site/MotionLayer";
 
-export const Route=createFileRoute("/")({head:()=>({meta:[{title:"Meridian Estate Intelligence — Property Brokerage"},{name:"description",content:"Find verified properties with intelligent matching and professional brokerage support."},{property:"og:title",content:"Meridian Estate Intelligence"},{property:"og:description",content:"Verified property discovery with intelligent matching."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Home});
-function Home(){const{properties}=useApp();const nav=useNavigate({from:"/"});const[purpose,setPurpose]=useState("Buy");const[location,setLocation]=useState("DHA");const[beds,setBeds]=useState("5");const[budget,setBudget]=useState("50000000");const search=()=>nav({to:"/properties",search:{q:location,purpose,type:"",city:"",min:0,max:Number(budget),beds:Number(beds),verified:false,sort:"relevant",view:"grid",page:1}});return <PublicShell><section className="relative min-h-[650px] overflow-hidden bg-hero text-hero-foreground"><img src={hero} alt="Contemporary residence in Lahore" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover opacity-55"/><div className="absolute inset-0 bg-gradient-to-r from-hero via-hero/80 to-transparent"/><div className="relative mx-auto grid max-w-7xl gap-12 px-6 pb-20 pt-24 lg:grid-cols-[1.05fr_.95fr]"><div className="animate-rise"><span className="inline-flex items-center gap-2 rounded-full border border-hero-foreground/20 bg-hero/40 px-3 py-1.5 text-xs"><Sparkles className="size-3 text-accent"/> AI-assisted property matching</span><h1 className="mt-6 max-w-2xl font-display text-5xl font-semibold leading-[1.04] sm:text-6xl">Find a property that fits your life.</h1><p className="mt-5 max-w-lg text-base leading-7 text-hero-foreground/70">Tell us what you need. Our brokerage surfaces verified homes across DHA, Bahria Town and beyond—then coordinates the rest.</p><div className="mt-8 flex flex-wrap gap-3"><Link to="/properties" search={{q:"",purpose:"",type:"",city:"",min:0,max:0,beds:0,verified:false,sort:"relevant",view:"grid",page:1}} className="rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Browse properties</Link><Link to="/contact" className="rounded-lg border border-hero-foreground/20 bg-hero/40 px-6 py-3 text-sm font-semibold">Book a consultation</Link></div><div className="mt-11 flex gap-8 text-sm"><div><b className="block font-display text-2xl">20</b><span className="text-hero-foreground/60">Sample listings</span></div><div><b className="block font-display text-2xl">7</b><span className="text-hero-foreground/60">Property types & states</span></div><div><b className="block font-display text-2xl">3</b><span className="text-hero-foreground/60">Cities covered</span></div></div></div><div className="glass-panel self-center rounded-2xl p-6 text-foreground shadow-2xl"><div className="grid grid-cols-2 rounded-lg bg-muted p-1"><button className={`rounded-md py-2 text-sm font-semibold ${purpose==="Buy"?"bg-card shadow-sm":"text-muted-foreground"}`} onClick={()=>setPurpose("Buy")}>Buy</button><button className={`rounded-md py-2 text-sm font-semibold ${purpose==="Rent"?"bg-card shadow-sm":"text-muted-foreground"}`} onClick={()=>setPurpose("Rent")}>Rent</button></div><label className="mt-4 block text-xs font-semibold text-muted-foreground">LOCATION<input value={location} onChange={e=>setLocation(e.target.value)} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-3 text-sm text-foreground"/></label><div className="mt-3 grid grid-cols-2 gap-3"><label className="text-xs font-semibold text-muted-foreground">BEDROOMS<select value={beds} onChange={e=>setBeds(e.target.value)} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-3 text-sm text-foreground"><option>3</option><option>4</option><option>5</option><option>6</option></select></label><label className="text-xs font-semibold text-muted-foreground">MAX BUDGET<select value={budget} onChange={e=>setBudget(e.target.value)} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-3 text-sm text-foreground"><option value="30000000">PKR 3 Crore</option><option value="50000000">PKR 5 Crore</option><option value="100000000">PKR 10 Crore</option></select></label></div><Button onClick={search} className="mt-4 w-full"><Search className="size-4"/>Search properties</Button></div></div></section><section className="mx-auto max-w-7xl px-6 py-20"><div className="flex items-end justify-between"><div><p className="text-xs font-bold uppercase text-primary">Featured</p><h2 className="mt-2 font-display text-3xl font-semibold">Hand-picked listings</h2></div><Link to="/properties" search={{q:"",purpose:"",type:"",city:"",min:0,max:0,beds:0,verified:false,sort:"relevant",view:"grid",page:1}} className="text-sm font-semibold text-primary">View all <ArrowRight className="inline size-4"/></Link></div><div className="mt-8 grid gap-6 md:grid-cols-3">{properties.filter(p=>p.status==="Available").slice(0,3).map(p=><PropertyCard key={p.id} property={p}/>)}</div></section><section className="bg-card py-20"><div className="mx-auto max-w-7xl px-6"><div className="max-w-xl"><p className="text-xs font-bold uppercase text-primary">Clear process</p><h2 className="mt-2 font-display text-3xl font-semibold">From requirement to closing</h2></div><div className="mt-10 grid gap-6 md:grid-cols-5">{[{Icon:Search,label:"Submit Requirement"},{Icon:Bot,label:"AI Finds Matches"},{Icon:ShieldCheck,label:"Brokerage Verifies"},{Icon:Building2,label:"Property Viewing"},{Icon:CheckCircle2,label:"Deal Finalization"}].map(({Icon,label},i)=><div key={label} className="relative border-t-2 border-primary pt-4"><span className="text-xs text-primary">0{i+1}</span><Icon className="mt-4 size-6"/><h3 className="mt-3 text-sm font-semibold">{label}</h3></div>)}</div></div></section><section className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-2"><div><p className="text-xs font-bold uppercase text-primary">Intelligent assistance</p><h2 className="mt-2 font-display text-4xl font-semibold">Your property search, intelligently assisted.</h2><p className="mt-5 max-w-lg text-muted-foreground">Share a requirement through WhatsApp, voice, or our online form. The system structures your preferences before a broker reviews the shortlist.</p><div className="mt-6 flex gap-3"><span className="rounded-lg border border-border px-3 py-2 text-sm"><MessageCircleIcon/> WhatsApp</span><span className="rounded-lg border border-border px-3 py-2 text-sm"><Mic className="mr-2 inline size-4"/> Voice</span><span className="rounded-lg border border-border px-3 py-2 text-sm"><Headphones className="mr-2 inline size-4"/> Brokerage</span></div></div><div className="rounded-xl border border-border bg-card p-6 shadow-lg"><div className="ml-auto max-w-sm rounded-xl bg-primary p-3 text-sm text-primary-foreground">I need a 10 Marla house in DHA with 5 bedrooms.</div><div className="mt-3 max-w-sm rounded-xl bg-muted p-3 text-sm">Understood. I found 12 properties aligned with your requirements.</div><div className="mt-6 grid grid-cols-2 gap-3">{[["Location","DHA"],["Size","10 Marla"],["Bedrooms","5"],["Budget","PKR 4–5 Crore"]].map(([a,b])=><div key={a} className="border-b border-border pb-2"><small className="text-muted-foreground">{a}</small><b className="block text-sm">{b}</b></div>)}</div></div></section></PublicShell>}
-function MessageCircleIcon(){return <span className="mr-2 inline-block size-2 rounded-full bg-success"/>}
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Aurelia Estates — Find Verified Homes with AI Assistance" },
+      { name: "description", content: "Buy, rent or sell verified properties in Karachi, Lahore and Islamabad with AI-powered matching and expert brokers." },
+      { property: "og:title", content: "Aurelia Estates — AI-Powered Property Brokerage" },
+      { property: "og:description", content: "Verified properties, intelligent matching and white-glove brokerage." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Index,
+});
+
+function Index() {
+  const featured = PROPERTIES.filter((p) => p.featured);
+  return (
+    <PublicShell>
+      {/* Hero */}
+      <section className="fusion-hero relative flex items-end overflow-hidden bg-ink pb-12 pt-32 text-ink-foreground">
+        <img src={hero} data-parallax alt="Contemporary villa with landscaped gardens and mountain views" width={1920} height={1088} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-hero" />
+        <CircuitField />
+        <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6">
+          <div className="max-w-3xl">
+            <span className="glass-dark inline-flex animate-fade-up items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold">
+              <Sparkles className="h-3.5 w-3.5 text-primary" /> AI-powered brokerage · Human-verified
+            </span>
+            <h1 className="mt-6 text-5xl font-medium leading-[1.08] sm:text-6xl md:text-7xl">
+              <MotionText text="Aurelia Estates" />
+            </h1>
+            <p className="mt-6 max-w-xl animate-fade-up text-lg text-ink-foreground/80 [animation-delay:240ms]">
+              Remarkable homes. The right people. Our AI matches you with verified properties, and our brokers handle everything else.
+            </p>
+          </div>
+          <SearchBar className="mt-10 max-w-5xl animate-fade-up [animation-delay:360ms] shadow-elegant hover:shadow-card transition-shadow duration-500" />
+          <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-ink-foreground/75 animate-fade-up [animation-delay:480ms]">
+            <span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" /> Every listing verified</span>
+            <span className="flex items-center gap-2"><Star className="h-4 w-4 fill-primary text-primary" /> 4.9 from 2,300+ clients</span>
+            <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" /> Private seller details, always</span>
+          </div>
+        </div>
+      </section>
+
+      <div className="motion-ticker overflow-hidden border-y border-primary/25 bg-ink py-4 text-ink-foreground" aria-label="Verified homes, intelligent matching, private viewings">
+        <div className="motion-ticker-track" aria-hidden="true">{[0, 1, 2, 3].map((i) => <span key={i} className="flex shrink-0 items-center gap-8 px-4 text-sm font-semibold uppercase"><span>Verified homes</span><Sparkles className="h-4 w-4 text-primary" /><span>Intelligent matching</span><span className="text-motion-accent">✦</span><span>Private viewings</span><Sparkles className="h-4 w-4 text-primary" /></span>)}</div>
+      </div>
+
+      <div className="-mt-px bg-background pt-16"><StatsBand /></div>
+
+      {/* Featured */}
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+          <SectionHeading align="left" eyebrow="Featured properties" title={<>Handpicked, <em className="text-primary">verified</em> residences</>} text="Exact addresses and owner details are shared only after verification and a confirmed viewing." />
+          <Button asChild variant="outline" size="lg"><Link to="/properties">View all properties <ArrowRight /></Link></Button>
+        </div>
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((p, i) => (
+            <Reveal key={p.id} delay={(i % 3) * 120}><PropertyCard p={p} /></Reveal>
+          ))}
+        </div>
+      </section>
+
+      <div className="bg-muted/60"><HowItWorks /></div>
+      <AISection />
+
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+        <SectionHeading eyebrow="Our services" title="Everything you need, under one roof" text="For buyers, tenants and sellers — powered by data, delivered by people." />
+        <div className="mt-14"><ServicesGrid /></div>
+      </section>
+
+      <Reviews />
+      <CTA />
+      <div className="bg-muted/60"><ContactBlock /></div>
+    </PublicShell>
+  );
+}

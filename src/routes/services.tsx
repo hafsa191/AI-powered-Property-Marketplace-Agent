@@ -1,3 +1,33 @@
-import { createFileRoute, Link } from "@tanstack/react-router";import { Building, CheckCircle2, Handshake, House, ListPlus, SearchCheck, Users, CalendarDays } from "lucide-react";import { PublicShell } from "@/components/PublicShell";
-export const Route=createFileRoute("/services")({head:()=>({meta:[{title:"Property Services — Meridian"},{name:"description",content:"Buying, renting, listing, verification and brokerage coordination services."},{property:"og:title",content:"Meridian Property Services"},{property:"og:description",content:"Property services from matching through coordination."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Services});
-function Services(){const services=[{Icon:House,title:"Property Buying"},{Icon:Building,title:"Property Renting"},{Icon:ListPlus,title:"Property Listing"},{Icon:SearchCheck,title:"Intelligent Property Matching"},{Icon:CheckCircle2,title:"Property Verification"},{Icon:Users,title:"Buyer Assistance"},{Icon:Handshake,title:"Seller Assistance"},{Icon:CalendarDays,title:"Meeting Coordination"}];return <PublicShell><section className="mx-auto max-w-7xl px-6 py-20"><p className="text-xs font-bold uppercase text-primary">Services</p><h1 className="mt-3 max-w-2xl font-display text-5xl font-semibold">Brokerage support at every stage.</h1><p className="mt-5 max-w-xl text-muted-foreground">Focused help for property discovery, listing, review, viewing and deal coordination.</p><div className="mt-12 grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-2 lg:grid-cols-4">{services.map(({Icon,title})=><article key={title} className="bg-card p-6"><Icon className="size-7 text-primary"/><h2 className="mt-5 font-display text-lg font-semibold">{title}</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">Practical brokerage guidance with clear next steps and protected client information.</p><Link to="/contact" className="mt-5 inline-block text-sm font-semibold text-primary">Speak with brokerage →</Link></article>)}</div></section></PublicShell>}
+import { createFileRoute } from "@tanstack/react-router";
+import { PublicShell, PageHero } from "@/components/site/PublicShell";
+import { AISection, CTA, ServicesGrid } from "@/components/site/sections";
+import { SectionHeading } from "@/components/site/primitives";
+import p4 from "@/assets/p4.jpg";
+
+export const Route = createFileRoute("/services")({
+  head: () => ({
+    meta: [
+      { title: "Services — Buying, Renting, Listing & AI Matching | Aurelia Estates" },
+      { name: "description", content: "Property buying, renting, listing, verification, AI matching and meeting coordination." },
+      { property: "og:title", content: "Aurelia Estates Services" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:description", content: "End-to-end brokerage services for buyers, tenants and sellers." },
+    ],
+  }),
+  component: Services,
+});
+
+function Services() {
+  return (
+    <PublicShell>
+      <PageHero image={p4} eyebrow="Services" title="Full-service brokerage, intelligently delivered" text="Whether you're buying, renting or selling, we handle every step." />
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+        <SectionHeading eyebrow="What we do" title="Eight ways we help you move" />
+        <div className="mt-14"><ServicesGrid /></div>
+      </section>
+      <AISection />
+      <div className="pt-24"><CTA /></div>
+    </PublicShell>
+  );
+}

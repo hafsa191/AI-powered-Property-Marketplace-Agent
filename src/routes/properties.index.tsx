@@ -1,7 +1,177 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Grid2X2, List, Search, SlidersHorizontal, X } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { PublicShell } from "@/components/PublicShell";import { PropertyCard } from "@/components/PropertyCard";import { Button } from "@/components/ui/AppButton";import { useApp } from "@/context/AppContext";
-const defaults={q:"",purpose:"",type:"",city:"",min:0,max:0,beds:0,verified:false,sort:"relevant",view:"grid",page:1};
-export const Route=createFileRoute("/properties/")({validateSearch:(s:Record<string,unknown>)=>({q:String(s['q']??""),purpose:String(s['purpose']??""),type:String(s['type']??""),city:String(s['city']??""),min:Number(s['min']??0),max:Number(s['max']??0),beds:Number(s['beds']??0),verified:s['verified']===true||s['verified']==="true",sort:String(s['sort']??"relevant"),view:String(s['view']??"grid"),page:Number(s['page']??1)}),head:()=>({meta:[{title:"Properties — Meridian Estate Intelligence"},{name:"description",content:"Browse verified homes, apartments and plots across Pakistan."},{property:"og:title",content:"Property Search — Meridian"},{property:"og:description",content:"Search brokerage-verified properties."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Properties});
-function Properties(){const{properties}=useApp();const s=Route.useSearch();const nav=Route.useNavigate();const[mobile,setMobile]=useState(false);const update=(p:Partial<typeof s>)=>nav({to:".",search:prev=>({...prev,...p,page:1})});const filtered=useMemo(()=>properties.filter(p=>!["Draft","Archived"].includes(p.status)).filter(p=>!s.q||`${p.title} ${p.area} ${p.city} ${p.type} ${p.beds} bedroom ${p.description}`.toLowerCase().includes(s.q.toLowerCase())).filter(p=>!s.purpose||p.purpose===s.purpose).filter(p=>!s.type||p.type===s.type).filter(p=>!s.city||p.city===s.city).filter(p=>!s.min||p.price>=s.min).filter(p=>!s.max||p.price<=s.max).filter(p=>!s.beds||p.beds>=s.beds).filter(p=>!s.verified||p.verified).sort((a,b)=>s.sort==="low"?a.price-b.price:s.sort==="high"?b.price-a.price:s.sort==="largest"?b.size-a.size:b.createdAt.localeCompare(a.createdAt)),[properties,s]);const paged=filtered.slice((s.page-1)*6,s.page*6);const controls=<div className="space-y-5"><div className="flex items-center justify-between"><b>Filters</b><button onClick={()=>nav({to:".",search:defaults})} className="text-xs font-semibold text-primary">Reset all</button></div><label className="block text-xs font-semibold">SEARCH<input value={s.q} onChange={e=>update({q:e.target.value})} className="mt-1 w-full rounded-lg border border-border bg-background p-2.5" placeholder="DHA 5 bedroom"/></label>{[["PURPOSE","purpose",["","Buy","Rent"]],["PROPERTY TYPE","type",["","House","Apartment","Plot","Commercial"]],["CITY","city",["","Lahore","Islamabad","Karachi","Rawalpindi"]]].map(([label,key,opts])=><label key={String(key)} className="block text-xs font-semibold">{String(label)}<select value={String(s[key as "purpose"])} onChange={e=>update(key==="purpose"?{purpose:e.target.value}:key==="type"?{type:e.target.value}:{city:e.target.value})} className="mt-1 w-full rounded-lg border border-border bg-background p-2.5"><option value="">Any</option>{(opts as string[]).filter(Boolean).map(o=><option key={o}>{o}</option>)}</select></label>)}<div className="grid grid-cols-2 gap-2"><label className="text-xs font-semibold">MIN PRICE<input type="number" value={s.min||""} onChange={e=>update({min:Number(e.target.value)})} className="mt-1 w-full rounded-lg border border-border bg-background p-2.5"/></label><label className="text-xs font-semibold">MAX PRICE<input type="number" value={s.max||""} onChange={e=>update({max:Number(e.target.value)})} className="mt-1 w-full rounded-lg border border-border bg-background p-2.5"/></label></div><label className="block text-xs font-semibold">MINIMUM BEDROOMS<select value={s.beds} onChange={e=>update({beds:Number(e.target.value)})} className="mt-1 w-full rounded-lg border border-border bg-background p-2.5"><option value="0">Any</option>{[2,3,4,5,6].map(n=><option key={n}>{n}</option>)}</select></label><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={s.verified} onChange={e=>update({verified:e.target.checked})}/> Verified only</label></div>;return <PublicShell><div className="mx-auto max-w-7xl px-5 py-10"><div><p className="text-xs font-bold uppercase text-primary">Property discovery</p><h1 className="mt-2 font-display text-4xl font-semibold">Find your next property</h1></div><div className="mt-8 flex gap-7"><aside className="hidden w-64 shrink-0 lg:block"><div className="sticky top-24 rounded-xl border border-border bg-card p-5">{controls}</div></aside><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-muted-foreground"><b className="text-foreground">{filtered.length}</b> properties found</p><div className="flex items-center gap-2"><Button variant="secondary" className="lg:hidden" onClick={()=>setMobile(true)}><SlidersHorizontal className="size-4"/>Filters</Button><select value={s.sort} onChange={e=>update({sort:e.target.value})} className="h-10 rounded-lg border border-border bg-card px-3 text-sm"><option value="relevant">Most relevant</option><option value="low">Price low → high</option><option value="high">Price high → low</option><option value="newest">Newest</option><option value="largest">Largest</option></select><button aria-label="Grid view" onClick={()=>update({view:"grid"})} className={`grid size-10 place-items-center rounded-lg ${s.view==="grid"?"bg-primary text-primary-foreground":"bg-card"}`}><Grid2X2 className="size-4"/></button><button aria-label="List view" onClick={()=>update({view:"list"})} className={`grid size-10 place-items-center rounded-lg ${s.view==="list"?"bg-primary text-primary-foreground":"bg-card"}`}><List className="size-4"/></button></div></div>{paged.length?<div className={`mt-5 grid gap-5 ${s.view==="grid"?"md:grid-cols-2 xl:grid-cols-3":"grid-cols-1"}`}>{paged.map(p=><PropertyCard key={p.id} property={p} list={s.view==="list"}/>)}</div>:<div className="mt-10 rounded-xl border border-dashed border-border p-12 text-center"><Search className="mx-auto size-8 text-muted-foreground"/><h2 className="mt-4 font-semibold">No properties match your current filters.</h2><Button className="mt-4" onClick={()=>nav({to:".",search:defaults})}>Clear Filters</Button></div>}<div className="mt-8 flex justify-center gap-2">{Array.from({length:Math.ceil(filtered.length/6)},(_,i)=><button key={i} onClick={()=>update({page:i+1})} className={`size-9 rounded-lg text-sm ${s.page===i+1?"bg-primary text-primary-foreground":"border border-border bg-card"}`}>{i+1}</button>)}</div></div></div></div>{mobile&&<div className="fixed inset-0 z-50 bg-foreground/30 lg:hidden"><div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-auto rounded-t-2xl bg-background p-6"><div className="mb-4 flex justify-end"><Button variant="ghost" onClick={()=>setMobile(false)}><X/></Button></div>{controls}<Button className="mt-6 w-full" onClick={()=>setMobile(false)}>Show {filtered.length} results</Button></div></div>}</PublicShell>}
+import { z } from "zod";
+import { SlidersHorizontal, SearchX, RotateCcw } from "lucide-react";
+import { PublicShell, PageHero } from "@/components/site/PublicShell";
+import { PropertyCard } from "@/components/site/PropertyCard";
+import { Reveal } from "@/components/site/primitives";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AMENITIES, PROPERTIES, TYPES, formatPKR } from "@/lib/data";
+import { cn } from "@/lib/utils";
+import p2 from "@/assets/p2.jpg";
+
+const search = z.object({
+  purpose: z.enum(["Buy", "Rent"]).optional(),
+  type: z.string().optional(),
+  area: z.string().optional(),
+  budget: z.string().optional(),
+});
+
+export const Route = createFileRoute("/properties/")({
+  validateSearch: search,
+  head: () => ({
+    meta: [
+      { title: "Properties for Sale & Rent — Aurelia Estates" },
+      { name: "description", content: "Browse verified houses, apartments, villas and commercial spaces with smart filters." },
+      { property: "og:title", content: "Browse Verified Properties — Aurelia Estates" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:description", content: "Filter by area, price, size, bedrooms, furnishing and amenities." },
+    ],
+  }),
+  component: PropertiesPage,
+});
+
+interface Filters {
+  purpose: "All" | "Buy" | "Rent";
+  type: string;
+  area: string;
+  maxPrice: number;
+  minSize: number;
+  beds: number;
+  baths: number;
+  furnishing: string;
+  amenities: string[];
+}
+
+function PropertiesPage() {
+  const s = Route.useSearch();
+  const maxBudget = s.budget ? Number(s.budget.split("-")[1]) : 200000000;
+  const initial: Filters = {
+    purpose: s.purpose ?? "All", type: s.type ?? "any", area: s.area ?? "", maxPrice: Math.min(maxBudget, 200000000),
+    minSize: 0, beds: 0, baths: 0, furnishing: "any", amenities: [],
+  };
+  const [f, setF] = useState<Filters>(initial);
+  const [sort, setSort] = useState("featured");
+  const reset = () => setF({ ...initial, purpose: "All", type: "any", area: "", maxPrice: 200000000 });
+
+  const results = useMemo(() => {
+    const r = PROPERTIES.filter(
+      (p) =>
+        (f.purpose === "All" || p.purpose === f.purpose) &&
+        (f.type === "any" || p.type === f.type) &&
+        (!f.area || `${p.area} ${p.city}`.toLowerCase().includes(f.area.toLowerCase())) &&
+        p.price <= f.maxPrice && p.sizeSqft >= f.minSize && p.beds >= f.beds && p.baths >= f.baths &&
+        (f.furnishing === "any" || p.furnishing === f.furnishing) &&
+        f.amenities.every((a) => p.amenities.includes(a)),
+    );
+    if (sort === "low") r.sort((a, b) => a.price - b.price);
+    if (sort === "high") r.sort((a, b) => b.price - a.price);
+    return r;
+  }, [f, sort]);
+
+  const panel = <FilterPanel f={f} setF={setF} reset={reset} />;
+
+  return (
+    <PublicShell>
+      <PageHero image={p2} eyebrow="Property search" title="Discover verified properties" text="Every listing is reviewed by our team. Exact locations are shared after your viewing is confirmed." />
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[300px_1fr]">
+        <aside className="hidden lg:block"><div className="sticky top-28">{panel}</div></aside>
+        <div>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground"><span className="font-semibold text-foreground">{results.length}</span> properties found</p>
+            <div className="flex gap-2">
+              <Sheet>
+                <SheetTrigger asChild><Button variant="outline" className="lg:hidden"><SlidersHorizontal /> Filters</Button></SheetTrigger>
+                <SheetContent side="left" className="w-[340px] overflow-y-auto"><SheetTitle className="sr-only">Filters</SheetTitle><div className="pt-6">{panel}</div></SheetContent>
+              </Sheet>
+              <Select value={sort} onValueChange={setSort}>
+                <SelectTrigger className="w-44 rounded-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="featured">Featured first</SelectItem>
+                  <SelectItem value="low">Price: low to high</SelectItem>
+                  <SelectItem value="high">Price: high to low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          {results.length === 0 ? (
+            <div className="grid place-items-center rounded-3xl border border-dashed border-border bg-card px-6 py-20 text-center">
+              <span className="grid h-16 w-16 place-items-center rounded-2xl bg-primary-soft text-primary"><SearchX className="h-7 w-7" /></span>
+              <h3 className="mt-5 text-2xl font-medium">No properties match these filters</h3>
+              <p className="mt-2 max-w-sm text-sm text-muted-foreground">Try widening your budget or area — or send us your requirement and our AI will alert you when one is listed.</p>
+              <Button className="mt-6" onClick={reset}><RotateCcw /> Reset filters</Button>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {results.map((p, i) => <Reveal key={p.id} delay={(i % 3) * 80}><PropertyCard p={p} /></Reveal>)}
+            </div>
+          )}
+        </div>
+      </section>
+    </PublicShell>
+  );
+}
+
+function FilterPanel({ f, setF, reset }: { f: Filters; setF: (f: Filters) => void; reset: () => void }) {
+  const set = <K extends keyof Filters>(k: K, v: Filters[K]) => setF({ ...f, [k]: v });
+  return (
+    <div className="space-y-6 rounded-3xl border border-border bg-card p-6 shadow-soft">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium">Filters</h3>
+        <button onClick={reset} className="text-xs font-semibold text-primary hover:underline">Reset all</button>
+      </div>
+      <Group label="Looking to">
+        <div className="grid grid-cols-3 gap-1 rounded-full bg-muted p-1">
+          {(["All", "Buy", "Rent"] as const).map((p) => (
+            <button key={p} onClick={() => set("purpose", p)} className={cn("rounded-full py-1.5 text-sm font-semibold transition-all", f.purpose === p ? "bg-card text-primary shadow-soft" : "text-muted-foreground")}>{p}</button>
+          ))}
+        </div>
+      </Group>
+      <Group label="Property type">
+        <div className="flex flex-wrap gap-1.5">
+          {["any", ...TYPES].map((t) => <Chip key={t} on={f.type === t} onClick={() => set("type", t)}>{t === "any" ? "All" : t}</Chip>)}
+        </div>
+      </Group>
+      <Group label="Area / city">
+        <input value={f.area} onChange={(e) => set("area", e.target.value)} placeholder="e.g. DHA, Clifton, Lahore" className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:border-primary" />
+      </Group>
+      <Group label={`Max price · ${formatPKR(f.maxPrice)}`}>
+        <Slider value={[f.maxPrice]} min={100000} max={200000000} step={100000} onValueChange={([v]) => set("maxPrice", v)} />
+      </Group>
+      <Group label={`Min size · ${f.minSize.toLocaleString()} sq ft`}>
+        <Slider value={[f.minSize]} min={0} max={9000} step={250} onValueChange={([v]) => set("minSize", v)} />
+      </Group>
+      <Group label="Bedrooms">
+        <div className="flex gap-1.5">{[0, 1, 2, 3, 4, 5].map((n) => <Chip key={n} on={f.beds === n} onClick={() => set("beds", n)}>{n === 0 ? "Any" : `${n}+`}</Chip>)}</div>
+      </Group>
+      <Group label="Bathrooms">
+        <div className="flex gap-1.5">{[0, 1, 2, 3, 4].map((n) => <Chip key={n} on={f.baths === n} onClick={() => set("baths", n)}>{n === 0 ? "Any" : `${n}+`}</Chip>)}</div>
+      </Group>
+      <Group label="Furnishing">
+        <div className="flex flex-wrap gap-1.5">{["any", "Furnished", "Semi-furnished", "Unfurnished"].map((t) => <Chip key={t} on={f.furnishing === t} onClick={() => set("furnishing", t)}>{t === "any" ? "Any" : t}</Chip>)}</div>
+      </Group>
+      <Group label="Amenities">
+        <div className="flex flex-wrap gap-1.5">
+          {AMENITIES.map((a) => (
+            <Chip key={a} on={f.amenities.includes(a)} onClick={() => set("amenities", f.amenities.includes(a) ? f.amenities.filter((x) => x !== a) : [...f.amenities, a])}>{a}</Chip>
+          ))}
+        </div>
+      </Group>
+    </div>
+  );
+}
+
+function Group({ label, children }: { label: string; children: React.ReactNode }) {
+  return <div><p className="mb-2.5 text-xs font-bold uppercase tracking-widest text-muted-foreground">{label}</p>{children}</div>;
+}
+function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button onClick={onClick} className={cn("rounded-full border px-3 py-1.5 text-xs font-semibold transition-all", on ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary hover:text-primary")}>
+      {children}
+    </button>
+  );
+}

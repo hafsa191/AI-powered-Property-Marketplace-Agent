@@ -1,4 +1,57 @@
-import { createFileRoute } from "@tanstack/react-router";import type { ReactNode } from "react";import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";import { Page } from "@/components/Page";import { useApp } from "@/context/AppContext";
-export const Route=createFileRoute("/admin/analytics")({head:()=>({meta:[{title:"Analytics — Meridian Operations"},{name:"description",content:"Property, query and transaction analytics."},{property:"og:title",content:"Brokerage Analytics"},{property:"og:description",content:"Property, query and transaction analytics."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Analytics});
-function Analytics(){const{properties,queries,meetings}=useApp();const months=["May","Jun","Jul","Aug","Sep","Oct"].map((m,i)=>({month:m,buyers:4+i*2,sellers:3+i,meetings:meetings.filter((_,x)=>x%6===i).length+2}));const statuses=Array.from(new Set(queries.map(q=>q.status))).map(name=>({name,value:queries.filter(q=>q.status===name).length}));const colors=["var(--primary)","var(--accent)","var(--success)","var(--warning)"];return <Page eyebrow="Performance" title="Analytics" description="Meaningful summaries calculated from the demonstration records."><div className="grid gap-5 xl:grid-cols-2"><Chart title="Query & meeting volume"><ResponsiveContainer width="100%" height={260}><LineChart data={months}><CartesianGrid stroke="var(--border)"/><XAxis dataKey="month"/><YAxis/><Tooltip/><Legend/><Line dataKey="buyers" stroke="var(--primary)" strokeWidth={2}/><Line dataKey="sellers" stroke="var(--accent)" strokeWidth={2}/><Line dataKey="meetings" stroke="var(--success)" strokeWidth={2}/></LineChart></ResponsiveContainer></Chart><Chart title="Query status distribution"><ResponsiveContainer width="100%" height={260}><PieChart><Pie data={statuses} dataKey="value" nameKey="name" innerRadius={58} outerRadius={90}>{statuses.map((_,i)=><Cell key={i} fill={colors[i%colors.length]}/>)}</Pie><Tooltip/><Legend/></PieChart></ResponsiveContainer></Chart><Chart title="Property status"><ResponsiveContainer width="100%" height={260}><BarChart data={Array.from(new Set(properties.map(p=>p.status))).map(name=>({name,value:properties.filter(p=>p.status===name).length}))}><CartesianGrid stroke="var(--border)"/><XAxis dataKey="name" tick={{fontSize:10}}/><YAxis/><Tooltip/><Bar dataKey="value" fill="var(--primary)" radius={[4,4,0,0]}/></BarChart></ResponsiveContainer></Chart><Chart title="Sold vs rented"><div className="grid h-[260px] grid-cols-2 place-items-center gap-4"><Metric label="Sold" value={properties.filter(p=>p.status==="Sold").length}/><Metric label="Rented" value={properties.filter(p=>p.status==="Rented").length}/></div></Chart></div></Page>}
-function Chart({title,children}:{title:string;children:ReactNode}){return <section className="rounded-xl border border-border bg-card p-5"><b>{title}</b><div className="mt-5">{children}</div></section>}function Metric({label,value}:{label:string;value:number}){return <div className="text-center"><b className="font-display text-5xl text-primary">{value}</b><p className="mt-2 text-sm text-muted-foreground">{label} properties</p></div>}
+import { createFileRoute } from "@tanstack/react-router";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Area, AreaChart } from "recharts";
+import { PageHeader, Panel, chartTooltip } from "@/components/admin/ui";
+import { DEALS, MATCH_PERF, PRICE_TREND, QUERY_STATUS, VOLUME } from "@/lib/admin-data";
+
+export const Route = createFileRoute("/admin/analytics")({
+  head: () => ({ meta: [{ title: "Analytics — Aurelia Admin" }, { name: "description", content: "Analytics for the Aurelia Estates brokerage team." }, { property: "og:title", content: "Analytics — Aurelia Admin" }, { property: "og:description", content: "Analytics for the Aurelia Estates brokerage team." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { name: "robots", content: "noindex" }] }),
+  component: Analytics,
+});
+
+const ax = { stroke: "var(--muted-foreground)", fontSize: 12, tickLine: false, axisLine: false } as const;
+const grid = <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />;
+const COLORS = ["var(--warning)", "var(--chart-1)", "var(--destructive)", "var(--chart-4)"];
+const NOTIF = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d, i) => ({ d, sent: [120, 140, 132, 168, 150, 190, 90][i] }));
+
+function Analytics() {
+  return (
+    <>
+      <PageHeader title="Analytics" text="Market and operational performance at a glance." />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Panel title="Avg. price trend (PKR Lac / Marla)">
+          <div className="h-72"><ResponsiveContainer><LineChart data={PRICE_TREND}>{grid}<XAxis dataKey="m" {...ax} /><YAxis {...ax} /><Tooltip {...chartTooltip} /><Legend />
+            <Line type="monotone" dataKey="karachi" stroke="var(--chart-1)" strokeWidth={2.5} dot={false} />
+            <Line type="monotone" dataKey="lahore" stroke="var(--chart-2)" strokeWidth={2.5} dot={false} />
+            <Line type="monotone" dataKey="islamabad" stroke="var(--chart-4)" strokeWidth={2.5} dot={false} />
+          </LineChart></ResponsiveContainer></div>
+        </Panel>
+        <Panel title="Buyer & seller volume">
+          <div className="h-72"><ResponsiveContainer><BarChart data={VOLUME}>{grid}<XAxis dataKey="d" {...ax} /><YAxis {...ax} /><Tooltip {...chartTooltip} /><Legend />
+            <Bar dataKey="buyers" fill="var(--chart-1)" radius={[6, 6, 0, 0]} /><Bar dataKey="sellers" fill="var(--chart-2)" radius={[6, 6, 0, 0]} />
+          </BarChart></ResponsiveContainer></div>
+        </Panel>
+        <Panel title="AI matching performance (%)">
+          <div className="h-72"><ResponsiveContainer><AreaChart data={MATCH_PERF}>{grid}<XAxis dataKey="w" {...ax} /><YAxis {...ax} domain={[40, 100]} /><Tooltip {...chartTooltip} /><Legend />
+            <Area type="monotone" dataKey="accuracy" stroke="var(--chart-1)" fill="var(--primary-soft)" strokeWidth={2.5} />
+            <Area type="monotone" dataKey="accepted" stroke="var(--chart-4)" fill="transparent" strokeWidth={2.5} />
+          </AreaChart></ResponsiveContainer></div>
+        </Panel>
+        <Panel title="Query status">
+          <div className="h-72"><ResponsiveContainer><PieChart><Tooltip {...chartTooltip} /><Legend />
+            <Pie data={QUERY_STATUS} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} paddingAngle={3}>{QUERY_STATUS.map((_, i) => <Cell key={i} fill={COLORS[i]} stroke="var(--card)" />)}</Pie>
+          </PieChart></ResponsiveContainer></div>
+        </Panel>
+        <Panel title="Notification activity">
+          <div className="h-72"><ResponsiveContainer><AreaChart data={NOTIF}>{grid}<XAxis dataKey="d" {...ax} /><YAxis {...ax} /><Tooltip {...chartTooltip} />
+            <Area type="monotone" dataKey="sent" stroke="var(--chart-2)" fill="var(--primary-soft)" strokeWidth={2.5} />
+          </AreaChart></ResponsiveContainer></div>
+        </Panel>
+        <Panel title="Sold vs rented">
+          <div className="h-72"><ResponsiveContainer><BarChart data={DEALS}>{grid}<XAxis dataKey="m" {...ax} /><YAxis {...ax} /><Tooltip {...chartTooltip} /><Legend />
+            <Bar dataKey="sold" stackId="a" fill="var(--chart-1)" /><Bar dataKey="rented" stackId="a" fill="var(--chart-3)" radius={[6, 6, 0, 0]} />
+          </BarChart></ResponsiveContainer></div>
+        </Panel>
+      </div>
+    </>
+  );
+}

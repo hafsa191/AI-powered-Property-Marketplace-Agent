@@ -1,3 +1,41 @@
-import { createFileRoute } from "@tanstack/react-router";import { Star, Trash2 } from "lucide-react";import { Page } from "@/components/Page";import { Button } from "@/components/ui/AppButton";import { useApp } from "@/context/AppContext";
-export const Route=createFileRoute("/admin/reviews")({head:()=>({meta:[{title:"Reviews — Meridian Operations"},{name:"description",content:"Moderate and feature brokerage reviews."},{property:"og:title",content:"Reviews Management"},{property:"og:description",content:"Moderate and feature brokerage reviews."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Reviews});
-function Reviews(){const{reviews,updateReview}=useApp();return <Page eyebrow="Reputation" title="Reviews" description="Approve, hide and feature client feedback."><div className="grid gap-4 md:grid-cols-2">{reviews.map(r=><article key={r.id} className="rounded-xl border border-border bg-card p-5"><div className="flex justify-between"><span className="text-warning">{"★".repeat(r.rating)}</span><span className="rounded-md bg-muted px-2 py-1 text-xs">{r.status}</span></div><p className="mt-4 text-sm leading-6 text-muted-foreground">“{r.text}”</p><b className="mt-4 block text-sm">{r.name} · {r.role}</b><div className="mt-4 flex flex-wrap gap-2">{r.status!=="Published"&&<Button onClick={()=>updateReview(r.id,{status:"Published"})}>Approve</Button>}<Button variant="secondary" onClick={()=>updateReview(r.id,{featured:!r.featured})}><Star className="size-4"/>{r.featured?"Unfeature":"Feature"}</Button><Button variant="ghost" onClick={()=>updateReview(r.id,{status:"Hidden"})}>Hide</Button><Button variant="ghost" aria-label="Delete review" onClick={()=>confirm("Delete this review?")&&updateReview(r.id,{status:"Hidden"})}><Trash2 className="size-4"/></Button></div></article>)}</div></Page>}
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { Star, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader, Panel, StatusBadge, DashboardCard } from "@/components/admin/ui";
+import { Button } from "@/components/ui/button";
+import { REVIEWS } from "@/lib/data";
+
+export const Route = createFileRoute("/admin/reviews")({
+  head: () => ({ meta: [{ title: "Reviews — Aurelia Admin" }, { name: "description", content: "Reviews for the Aurelia Estates brokerage team." }, { property: "og:title", content: "Reviews — Aurelia Admin" }, { property: "og:description", content: "Reviews for the Aurelia Estates brokerage team." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { name: "robots", content: "noindex" }] }),
+  component: Reviews,
+});
+
+function Reviews() {
+  const [hidden, setHidden] = useState<number[]>([]);
+  return (
+    <>
+      <PageHeader title="Reviews" text="Moderate client testimonials shown on the website." />
+      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <DashboardCard accent label="Average rating" value="4.9" icon={<Star />} />
+        <DashboardCard label="Total reviews" value={2318} delta={8} icon={<Star />} />
+        <DashboardCard label="Buyer reviews" value={1624} icon={<Star />} />
+        <DashboardCard label="Seller reviews" value={694} icon={<Star />} />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        {REVIEWS.map((r, i) => (
+          <Panel key={i} className={hidden.includes(i) ? "opacity-50" : ""}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-primary font-bold text-primary-foreground">{r.name[0]}</span><div><p className="font-semibold">{r.name}</p><div className="flex">{Array.from({ length: 5 }).map((_, k) => <Star key={k} className={k < r.rating ? "h-3.5 w-3.5 fill-primary text-primary" : "h-3.5 w-3.5 text-border"} />)}</div></div></div>
+              <StatusBadge status={r.role} />
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">“{r.text}”</p>
+            <Button size="sm" variant="outline" className="mt-4" onClick={() => { setHidden(hidden.includes(i) ? hidden.filter((x) => x !== i) : [...hidden, i]); toast.success("Visibility updated"); }}>
+              {hidden.includes(i) ? <><Eye /> Show on site</> : <><EyeOff /> Hide from site</>}
+            </Button>
+          </Panel>
+        ))}
+      </div>
+    </>
+  );
+}

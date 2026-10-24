@@ -10,28 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminBuyerQueriesRouteImport } from './routes/admin.buyer-queries'
 import { Route as AdminHistoryRouteImport } from './routes/admin.history'
 import { Route as AdminMatchingRouteImport } from './routes/admin.matching'
 import { Route as AdminMeetingsRouteImport } from './routes/admin.meetings'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminPropertiesRouteImport } from './routes/admin.properties'
-import { Route as AdminQueriesRouteImport } from './routes/admin.queries'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
+import { Route as AdminSellerQueriesRouteImport } from './routes/admin.seller-queries'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
-import { Route as PropertiesPropertyIdRouteImport } from './routes/properties.$propertyId'
+import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -49,6 +56,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PropertiesRoute = PropertiesRouteImport.update({
   id: '/properties',
   path: '/properties',
@@ -59,19 +71,24 @@ const ServicesRoute = ServicesRouteImport.update({
   path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminActivityRoute = AdminActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBuyerQueriesRoute = AdminBuyerQueriesRouteImport.update({
+  id: '/buyer-queries',
+  path: '/buyer-queries',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminHistoryRoute = AdminHistoryRouteImport.update({
@@ -99,14 +116,14 @@ const AdminPropertiesRoute = AdminPropertiesRouteImport.update({
   path: '/properties',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminQueriesRoute = AdminQueriesRouteImport.update({
-  id: '/queries',
-  path: '/queries',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminReviewsRoute = AdminReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSellerQueriesRoute = AdminSellerQueriesRouteImport.update({
+  id: '/seller-queries',
+  path: '/seller-queries',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -119,9 +136,9 @@ const PropertiesIndexRoute = PropertiesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PropertiesRoute,
 } as any)
-const PropertiesPropertyIdRoute = PropertiesPropertyIdRouteImport.update({
-  id: '/$propertyId',
-  path: '/$propertyId',
+const PropertiesIdRoute = PropertiesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
   getParentRoute: () => PropertiesRoute,
 } as any)
 
@@ -130,19 +147,21 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/services': typeof ServicesRoute
-  '/admin/activity': typeof AdminActivityRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/buyer-queries': typeof AdminBuyerQueriesRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/matching': typeof AdminMatchingRoute
   '/admin/meetings': typeof AdminMeetingsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/properties': typeof AdminPropertiesRoute
-  '/admin/queries': typeof AdminQueriesRoute
   '/admin/reviews': typeof AdminReviewsRoute
+  '/admin/seller-queries': typeof AdminSellerQueriesRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/properties/$propertyId': typeof PropertiesPropertyIdRoute
+  '/properties/$id': typeof PropertiesIdRoute
   '/admin/': typeof AdminIndexRoute
   '/properties/': typeof PropertiesIndexRoute
 }
@@ -150,40 +169,45 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/services': typeof ServicesRoute
-  '/admin/activity': typeof AdminActivityRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/buyer-queries': typeof AdminBuyerQueriesRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/matching': typeof AdminMatchingRoute
   '/admin/meetings': typeof AdminMeetingsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/properties': typeof AdminPropertiesRoute
-  '/admin/queries': typeof AdminQueriesRoute
   '/admin/reviews': typeof AdminReviewsRoute
+  '/admin/seller-queries': typeof AdminSellerQueriesRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/properties/$propertyId': typeof PropertiesPropertyIdRoute
+  '/properties/$id': typeof PropertiesIdRoute
   '/admin': typeof AdminIndexRoute
   '/properties': typeof PropertiesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/login': typeof LoginRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/services': typeof ServicesRoute
-  '/admin/activity': typeof AdminActivityRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/buyer-queries': typeof AdminBuyerQueriesRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/matching': typeof AdminMatchingRoute
   '/admin/meetings': typeof AdminMeetingsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/properties': typeof AdminPropertiesRoute
-  '/admin/queries': typeof AdminQueriesRoute
   '/admin/reviews': typeof AdminReviewsRoute
+  '/admin/seller-queries': typeof AdminSellerQueriesRoute
   '/admin/settings': typeof AdminSettingsRoute
-  '/properties/$propertyId': typeof PropertiesPropertyIdRoute
+  '/properties/$id': typeof PropertiesIdRoute
   '/admin/': typeof AdminIndexRoute
   '/properties/': typeof PropertiesIndexRoute
 }
@@ -194,19 +218,21 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/contact'
+    | '/login'
     | '/properties'
     | '/services'
-    | '/admin/activity'
+    | '/account'
     | '/admin/analytics'
+    | '/admin/buyer-queries'
     | '/admin/history'
     | '/admin/matching'
     | '/admin/meetings'
     | '/admin/notifications'
     | '/admin/properties'
-    | '/admin/queries'
     | '/admin/reviews'
+    | '/admin/seller-queries'
     | '/admin/settings'
-    | '/properties/$propertyId'
+    | '/properties/$id'
     | '/admin/'
     | '/properties/'
   fileRoutesByTo: FileRoutesByTo
@@ -214,48 +240,55 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/login'
     | '/services'
-    | '/admin/activity'
+    | '/account'
     | '/admin/analytics'
+    | '/admin/buyer-queries'
     | '/admin/history'
     | '/admin/matching'
     | '/admin/meetings'
     | '/admin/notifications'
     | '/admin/properties'
-    | '/admin/queries'
     | '/admin/reviews'
+    | '/admin/seller-queries'
     | '/admin/settings'
-    | '/properties/$propertyId'
+    | '/properties/$id'
     | '/admin'
     | '/properties'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/admin'
     | '/contact'
+    | '/login'
     | '/properties'
     | '/services'
-    | '/admin/activity'
+    | '/_authenticated/account'
     | '/admin/analytics'
+    | '/admin/buyer-queries'
     | '/admin/history'
     | '/admin/matching'
     | '/admin/meetings'
     | '/admin/notifications'
     | '/admin/properties'
-    | '/admin/queries'
     | '/admin/reviews'
+    | '/admin/seller-queries'
     | '/admin/settings'
-    | '/properties/$propertyId'
+    | '/properties/$id'
     | '/admin/'
     | '/properties/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
+  LoginRoute: typeof LoginRoute
   PropertiesRoute: typeof PropertiesRouteWithChildren
   ServicesRoute: typeof ServicesRoute
 }
@@ -267,6 +300,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -290,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/properties': {
       id: '/properties'
       path: '/properties'
@@ -304,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -311,18 +365,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/activity': {
-      id: '/admin/activity'
-      path: '/activity'
-      fullPath: '/admin/activity'
-      preLoaderRoute: typeof AdminActivityRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
       fullPath: '/admin/analytics'
       preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/buyer-queries': {
+      id: '/admin/buyer-queries'
+      path: '/buyer-queries'
+      fullPath: '/admin/buyer-queries'
+      preLoaderRoute: typeof AdminBuyerQueriesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/history': {
@@ -360,18 +414,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPropertiesRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/queries': {
-      id: '/admin/queries'
-      path: '/queries'
-      fullPath: '/admin/queries'
-      preLoaderRoute: typeof AdminQueriesRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/reviews': {
       id: '/admin/reviews'
       path: '/reviews'
       fullPath: '/admin/reviews'
       preLoaderRoute: typeof AdminReviewsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/seller-queries': {
+      id: '/admin/seller-queries'
+      path: '/seller-queries'
+      fullPath: '/admin/seller-queries'
+      preLoaderRoute: typeof AdminSellerQueriesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/settings': {
@@ -388,40 +442,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesIndexRouteImport
       parentRoute: typeof PropertiesRoute
     }
-    '/properties/$propertyId': {
-      id: '/properties/$propertyId'
-      path: '/$propertyId'
-      fullPath: '/properties/$propertyId'
-      preLoaderRoute: typeof PropertiesPropertyIdRouteImport
+    '/properties/$id': {
+      id: '/properties/$id'
+      path: '/$id'
+      fullPath: '/properties/$id'
+      preLoaderRoute: typeof PropertiesIdRouteImport
       parentRoute: typeof PropertiesRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 interface AdminRouteChildren {
-  AdminActivityRoute: typeof AdminActivityRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminBuyerQueriesRoute: typeof AdminBuyerQueriesRoute
   AdminHistoryRoute: typeof AdminHistoryRoute
   AdminMatchingRoute: typeof AdminMatchingRoute
   AdminMeetingsRoute: typeof AdminMeetingsRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPropertiesRoute: typeof AdminPropertiesRoute
-  AdminQueriesRoute: typeof AdminQueriesRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
+  AdminSellerQueriesRoute: typeof AdminSellerQueriesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminActivityRoute: AdminActivityRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminBuyerQueriesRoute: AdminBuyerQueriesRoute,
   AdminHistoryRoute: AdminHistoryRoute,
   AdminMatchingRoute: AdminMatchingRoute,
   AdminMeetingsRoute: AdminMeetingsRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPropertiesRoute: AdminPropertiesRoute,
-  AdminQueriesRoute: AdminQueriesRoute,
   AdminReviewsRoute: AdminReviewsRoute,
+  AdminSellerQueriesRoute: AdminSellerQueriesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -429,12 +494,12 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PropertiesRouteChildren {
-  PropertiesPropertyIdRoute: typeof PropertiesPropertyIdRoute
+  PropertiesIdRoute: typeof PropertiesIdRoute
   PropertiesIndexRoute: typeof PropertiesIndexRoute
 }
 
 const PropertiesRouteChildren: PropertiesRouteChildren = {
-  PropertiesPropertyIdRoute: PropertiesPropertyIdRoute,
+  PropertiesIdRoute: PropertiesIdRoute,
   PropertiesIndexRoute: PropertiesIndexRoute,
 }
 
@@ -444,9 +509,11 @@ const PropertiesRouteWithChildren = PropertiesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
+  LoginRoute: LoginRoute,
   PropertiesRoute: PropertiesRouteWithChildren,
   ServicesRoute: ServicesRoute,
 }

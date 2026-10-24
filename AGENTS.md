@@ -9,5 +9,5 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep all mock domain records in `src/data/demo.ts` and mutate them through `AppContext`, so public and admin metrics remain consistent.
-- Keep public-safe property fields separate from operational query and meeting records, so private brokerage data never reaches public cards.
+- Scope GSAP/ScrollTrigger and Lenis to PublicShell with browser-only dynamic imports and full cleanup, so admin workflows and SSR remain unaffected.
+- Keep motion palettes in semantic CSS theme presets, so the theme selector recolors interactive effects consistently.
